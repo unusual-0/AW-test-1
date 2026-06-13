@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AGARWOOD - Field Management App (Mockup)</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Additional inline adjustments for static site container */
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #050705;
+      margin: 0;
+    }
+    
+    /* Device frame wrapper for desktop viewing */
+    .device-container {
+      width: 100%;
+      max-width: 480px;
+      height: 100vh;
+      max-height: 900px;
+      position: relative;
+      background: var(--bg-primary);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.8);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      border: 4px solid #1c251c;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (max-width: 480px) {
+      .device-container {
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+        border: none;
+      }
+    }
+    
+    /* Custom tab navigation wrapper to fit our container */
+    #root-static {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Modal layout fix for our device container */
+    .modal-overlay {
+      position: absolute;
+      display: none; /* Controlled by JS */
+    }
+
+    /* Keep lists clean */
+    .tree-item {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .settings-item {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .tree-search {
+      margin: 10px 16px 12px;
+      position: relative;
+    }
+
+    .tree-search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .tree-search .input {
+      padding-left: 40px;
+    }
+
+    .badge-synced {
+      background: var(--green-dim);
+      color: var(--green-bright);
+      border: 1px solid rgba(74,145,64,0.3);
+    }
+    
+    /* Custom photo preview thumbnails */
+    .receipt-thumb-mock {
+      width: 48px;
+      height: 48px;
+      background: #1a251a;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="device-container">
+    <div id="root-static">
+      
+      <!-- App Header (Fixed at Top) -->
+      <div class="app-header">
+        <div class="app-logo">
+          <div class="app-logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--gold);">
+              <path d="M12 2L2 22h20L12 2z"></path>
+              <path d="M12 18l-3-6h6l-3 6z"></path>
+            </svg>
+          </div>
+          <div class="app-logo-text">
+            <h1>AGARWOOD</h1>
+            <p>Field Management App</p>
+          </div>
+        </div>
+        <div class="notif-btn" id="header-notif-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+          </svg>
+          <div class="notif-dot"></div>
+        </div>
+      </div>
+
+      <!-- Toast Container for messages -->
+      <div class="toast-container" id="toast-container"></div>
+
+      <!-- ── PAGE: HOME ── -->
+      <div class="page-content fade-in" id="page-home">
+        
+        <!-- Online/Offline Sync Card -->
+        <div class="sync-card" id="home-sync-card" style="cursor: pointer;">
+          <div class="sync-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+            </svg>
+          </div>
+          <div class="sync-info">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="sync-status-text">Online Status</span>
+              <div class="sync-dot"></div>
+            </div>
+            <div class="sync-time" id="home-sync-status-text">
+              <span style="color: var(--amber); fontWeight: 500;">
+                1 log pending sync to Google Sheets
+              </span>
+            </div>
+          </div>
+          <div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted);">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Main Stats Cards -->
+        <div class="stat-row">
+          <div class="stat-card" id="home-stat-trees" style="cursor: pointer;">
+            <div class="stat-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                <path d="M12 6v12"></path>
+                <path d="M8 10h8"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="stat-label">Trees Tracked</div>
+              <div class="stat-value">22</div>
+              <div class="stat-sub">of 2,445 total</div>
+            </div>
+          </div>
+          
+          <div class="stat-card" id="home-stat-expenses" style="cursor: pointer;">
+            <div class="stat-icon" style="background: var(--gold-dim); color: var(--gold);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="stat-label">Total Expense</div>
+              <div class="stat-value stat-value-gold" style="font-size: 18px; padding-top: 2px;">
+                ৳46,800
+              </div>
+              <div class="stat-sub">BDT local database</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending Sync Banner Alert -->
+        <div class="pending-banner" id="home-pending-banner">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--amber);">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span class="pending-banner-text">
+            1 log saved offline. Tap here to sync to Google Sheets.
+          </span>
+        </div>
+
+        <!-- Quick Actions Card -->
+        <div style="padding: 0 16px; margin-bottom: 16px;">
+          <div class="card-glass" style="padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+            <h2 style="font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">Quick Add Log</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <button class="btn btn-primary btn-open-tree">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Log Tree Status
+              </button>
+              <button class="btn btn-gold btn-open-expense">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Log Expense
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity List -->
+        <div class="activity-list">
+          <div class="section-header">
+            <span class="section-title">Recent Activity Logs</span>
+            <span class="section-link" id="home-view-all-activity">
+              View All
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </span>
+          </div>
+          
+          <div class="card" style="padding: 0 16px;">
+            
+            <!-- Activity Item 1 -->
+            <div class="activity-item tab-trigger" data-tab="trees">
+              <div class="activity-item-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                </svg>
+              </div>
+              <div class="activity-item-info">
+                <div class="activity-item-name">Tree 105 (A)</div>
+                <div class="activity-item-id">✓ OK / Healthy, 💉 Inoculated</div>
+              </div>
+              <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                <span class="badge badge-green" style="font-size: 9px; padding: 1px 6px;">synced</span>
+                <div class="activity-item-time">Jun 13, 04:50 PM</div>
+              </div>
+            </div>
+
+            <!-- Activity Item 2 -->
+            <div class="activity-item tab-trigger" data-tab="expenses">
+              <div class="activity-item-icon expense">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <div class="activity-item-info">
+                <div class="activity-item-name">Labour Wages</div>
+                <div class="activity-item-id">Plantation weeding work</div>
+              </div>
+              <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                <span style="font-weight: 600; color: var(--gold); font-size: 13px;">৳3,500</span>
+                <span class="badge badge-green" style="font-size: 9px; padding: 1px 6px;">synced</span>
+                <div class="activity-item-time">Jun 13, 02:30 PM</div>
+              </div>
+            </div>
+
+            <!-- Activity Item 3 -->
+            <div class="activity-item tab-trigger" data-tab="trees">
+              <div class="activity-item-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                </svg>
+              </div>
+              <div class="activity-item-info">
+                <div class="activity-item-name">Tree RS12 (RS)</div>
+                <div class="activity-item-id">🌿 Alive - Broken, 🪢 Rope Working</div>
+              </div>
+              <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                <span class="badge badge-amber" style="font-size: 9px; padding: 1px 6px;">pending</span>
+                <div class="activity-item-time">Jun 12, 11:15 AM</div>
+              </div>
+            </div>
+
+            <!-- Activity Item 4 -->
+            <div class="activity-item tab-trigger" data-tab="expenses">
+              <div class="activity-item-icon expense">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <div class="activity-item-info">
+                <div class="activity-item-name">Travel / Transport</div>
+                <div class="activity-item-id">Fare for transport of saplings</div>
+              </div>
+              <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                <span style="font-weight: 600; color: var(--gold); font-size: 13px;">৳1,200</span>
+                <span class="badge badge-green" style="font-size: 9px; padding: 1px 6px;">synced</span>
+                <div class="activity-item-time">Jun 12, 09:00 AM</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ── PAGE: TREES ── -->
+      <div class="page-content fade-in" id="page-trees" style="display: none;">
+        <div class="page-header" style="padding-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <h1 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">Tree Status Logs</h1>
+              <p style="font-size: 11px; color: var(--text-muted);">List of tree check-ups registered locally</p>
+            </div>
+            <button class="btn btn-primary btn-open-tree" style="padding: 8px 14px; border-radius: var(--radius-md); font-size: 12px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px;">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Add Log
+            </button>
+          </div>
+        </div>
+
+        <!-- Horizontal Site Chips selector -->
+        <div class="site-selector">
+          <button class="site-chip active">ALL SITES</button>
+          <button class="site-chip">A</button>
+          <button class="site-chip">B</button>
+          <button class="site-chip">C</button>
+          <button class="site-chip">D</button>
+          <button class="site-chip">E</button>
+          <button class="site-chip">Hingasia</button>
+          <button class="site-chip">RS</button>
+        </div>
+
+        <!-- Search Input -->
+        <div class="tree-search">
+          <svg class="tree-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" class="input" placeholder="Search Tree ID, notes, or inoculant...">
+        </div>
+
+        <!-- Log list container -->
+        <div style="padding: 0 16px;">
+          <div class="card" style="padding: 0; overflow: hidden;">
+            
+            <!-- Tree Item 1 -->
+            <div class="tree-item" style="position: relative; padding-right: 48px;">
+              <div class="tree-item-id">A</div>
+              <div class="tree-item-info">
+                <div class="tree-item-name" style="display: flex; align-items: center; gap: 8px;">
+                  Tree ID: A-22
+                  <span class="badge badge-green" style="font-size: 8px; padding: 0px 4px;">synced</span>
+                </div>
+                <div class="tree-item-meta">
+                  <span>Circum: 12" | </span>
+                  <span>Inoc: Busman - Tablet | </span>
+                  <span>Inoc Date: 2024-05-15</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; font-style: italic;">
+                  "Healthy growth, resin starting to form"
+                </p>
+                <div class="chip-group" style="margin-top: 8px; gap: 4px;">
+                  <span class="badge badge-green" style="font-size: 10px;">✓ OK / Healthy</span>
+                  <span class="badge badge-green" style="font-size: 10px;">💉 Inoculated</span>
+                </div>
+              </div>
+              <button class="btn-delete-mock" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Tree Item 2 -->
+            <div class="tree-item" style="position: relative; padding-right: 48px;">
+              <div class="tree-item-id dead">Hing</div>
+              <div class="tree-item-info">
+                <div class="tree-item-name" style="display: flex; align-items: center; gap: 8px;">
+                  Tree ID: H-102
+                  <span class="badge badge-green" style="font-size: 8px; padding: 0px 4px;">synced</span>
+                </div>
+                <div class="tree-item-meta">
+                  <span>Circum: 18" | </span>
+                  <span>Inoc: MSG | </span>
+                  <span>Inoc Date: 2023-09-01</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px; font-style: italic;">
+                  "Tree completely dried out, needs removal"
+                </p>
+                <div class="chip-group" style="margin-top: 8px; gap: 4px;">
+                  <span class="badge badge-red" style="font-size: 10px;">💀 Dead</span>
+                </div>
+              </div>
+              <button class="btn-delete-mock" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Tree Item 3 -->
+            <div class="tree-item" style="position: relative; padding-right: 48px;">
+              <div class="tree-item-id">RS</div>
+              <div class="tree-item-info">
+                <div class="tree-item-name" style="display: flex; align-items: center; gap: 8px;">
+                  Tree ID: RS-12
+                  <span class="badge badge-amber" style="font-size: 8px; padding: 0px 4px;">pending</span>
+                </div>
+                <div class="tree-item-meta">
+                  <span>Circum: 11" | </span>
+                  <span>Inoc: Osman (Raju) - Pipe | </span>
+                  <span>Inoc Date: 2025-02-10</span>
+                </div>
+                <div class="chip-group" style="margin-top: 8px; gap: 4px;">
+                  <span class="badge badge-amber" style="font-size: 10px;">🌿 Alive - Broken</span>
+                  <span class="badge badge-amber" style="font-size: 10px;">🪢 Rope Working</span>
+                </div>
+              </div>
+              <button class="btn-delete-mock" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ── PAGE: EXPENSES ── -->
+      <div class="page-content fade-in" id="page-expenses" style="display: none;">
+        <div class="page-header" style="padding-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <h1 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">Business Expenses</h1>
+              <p style="font-size: 11px; color: var(--text-muted);">BDT plantation costings log</p>
+            </div>
+            <button class="btn btn-gold btn-open-expense" style="padding: 8px 14px; border-radius: var(--radius-md); font-size: 12px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 4px;">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Add Expense
+            </button>
+          </div>
+        </div>
+
+        <!-- Expense summary card -->
+        <div class="expense-summary">
+          <div class="expense-total-label">TOTAL PLANTATION SPENDING</div>
+          <div class="expense-total"><span>৳</span>46,800</div>
+          <p style="font-size: 11px; color: var(--text-secondary); margin-top: 8px;">
+            Displaying 4 cost logs registered locally
+          </p>
+        </div>
+
+        <!-- Category selector chips -->
+        <div class="site-selector" style="margin-bottom: 12px;">
+          <button class="site-chip active">ALL</button>
+          <button class="site-chip">Labour Wages</button>
+          <button class="site-chip">Tree Purchase</button>
+          <button class="site-chip">Travel / Transport</button>
+          <button class="site-chip">Caretaker</button>
+        </div>
+
+        <!-- Expense log list -->
+        <div style="padding: 0 16px;">
+          <div class="card" style="padding: 0; overflow: hidden;">
+            
+            <!-- Expense Item 1 -->
+            <div class="tree-item" style="position: relative; padding-right: 48px;">
+              <div class="activity-item-icon expense">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <div class="tree-item-info" style="margin-left: 8px;">
+                <div class="tree-item-name" style="display: flex; align-items: center; gap: 8px;">
+                  Labour Wages
+                  <span class="badge badge-green" style="font-size: 8px; padding: 0px 4px;">synced</span>
+                </div>
+                <div class="tree-item-meta">
+                  <span>Date: Jun 13, 2026</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                  Plantation weeding work
+                </p>
+              </div>
+              <div style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                <div style="font-weight: 700; color: var(--gold); font-size: 15px;">৳3,500</div>
+                <button class="btn-delete-mock" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Expense Item 2 -->
+            <div class="tree-item" style="position: relative; padding-right: 48px;">
+              <div class="activity-item-icon expense">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <div class="tree-item-info" style="margin-left: 8px;">
+                <div class="tree-item-name" style="display: flex; align-items: center; gap: 8px;">
+                  Tree Purchase
+                  <span class="badge badge-green" style="font-size: 8px; padding: 0px 4px;">synced</span>
+                </div>
+                <div class="tree-item-meta">
+                  <span>Date: Jun 12, 2026</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                  Purchased 10 new saplings
+                </p>
+              </div>
+              <div style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                <div style="font-weight: 700; color: var(--gold); font-size: 15px;">৳35,000</div>
+                <button class="btn-delete-mock" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Expense Item 3 -->
+            <div class="tree-item" style="position: relative; padding-right: 48px;">
+              <div class="activity-item-icon expense">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <div class="tree-item-info" style="margin-left: 8px;">
+                <div class="tree-item-name" style="display: flex; align-items: center; gap: 8px;">
+                  Travel / Transport
+                  <span class="badge badge-green" style="font-size: 8px; padding: 0px 4px;">synced</span>
+                </div>
+                <div class="tree-item-meta">
+                  <span>Date: Jun 12, 2026</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                  Fare for transport of saplings
+                </p>
+              </div>
+              <div style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                <div style="font-weight: 700; color: var(--gold); font-size: 15px;">৳1,200</div>
+                <button class="btn-delete-mock" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Expense Item 4 -->
+            <div class="tree-item" style="position: relative; padding-right: 48px;">
+              <div class="activity-item-icon expense">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <div class="tree-item-info" style="margin-left: 8px;">
+                <div class="tree-item-name" style="display: flex; align-items: center; gap: 8px;">
+                  Caretaker
+                  <span class="badge badge-green" style="font-size: 8px; padding: 0px 4px;">synced</span>
+                </div>
+                <div class="tree-item-meta">
+                  <span>Date: Jun 10, 2026</span>
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                  Monthly caretaker salary
+                </p>
+              </div>
+              <div style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                <div style="font-weight: 700; color: var(--gold); font-size: 15px;">৳7,100</div>
+                <button class="btn-delete-mock" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ── PAGE: SYNC ── -->
+      <div class="page-content fade-in" id="page-sync" style="display: none;">
+        <div class="page-header">
+          <h1 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">Cloud Sync</h1>
+          <p style="font-size: 11px; color: var(--text-muted);">Send offline records to Google Sheets</p>
+        </div>
+
+        <!-- Connection Info -->
+        <div class="sync-card" style="cursor: default; margin: 16px;">
+          <div class="sync-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+              <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+              <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+              <line x1="12" y1="20" x2="12.01" y2="20" stroke-width="3"></line>
+            </svg>
+          </div>
+          <div class="sync-info">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="sync-status-text">Online</span>
+              <div class="sync-dot"></div>
+            </div>
+            <div class="sync-time">
+              Last Sync: Jun 13, 2026, 04:00 PM
+            </div>
+          </div>
+        </div>
+
+        <!-- Sync Button Action -->
+        <div style="padding: 0 16px 20px;">
+          <button class="btn btn-primary btn-full" id="btn-sync-trigger" style="height: 48px; font-size: 15px; font-weight: 600;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right: 6px;">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+            </svg>
+            <span>Sync 1 Pending Log Now</span>
+          </button>
+        </div>
+
+        <!-- Unsynced Logs List -->
+        <div style="padding: 0 16px;">
+          <div class="section-header">
+            <span class="section-title">Queue Pending Sync (1)</span>
+          </div>
+
+          <div class="card" style="padding: 0;">
+            <div class="tree-item" id="pending-sync-item-mock">
+              <div class="tree-item-id">RS</div>
+              <div class="tree-item-info">
+                <div class="tree-item-name" style="font-size: 13px;">
+                  Tree ID: RS-12
+                </div>
+                <div class="tree-item-meta">
+                  <span>Tree Log | Conditions: Alive - Broken, Rope Working</span>
+                </div>
+              </div>
+              <span class="badge badge-amber" style="font-size: 9px;">pending</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ── PAGE: SETTINGS ── -->
+      <div class="page-content fade-in" id="page-settings" style="display: none;">
+        <div class="page-header">
+          <h1 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">Settings & Setup</h1>
+          <p style="font-size: 11px; color: var(--text-muted);">Configure database connections and explore sites</p>
+        </div>
+
+        <!-- Connection Section -->
+        <div class="settings-section">
+          <div class="settings-section-title">Google Cloud Integration</div>
+          <div class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+            <div class="input-group" style="margin-bottom: 0;">
+              <label class="input-label">Google Apps Script Web App URL</label>
+              <input type="text" class="input" id="settings-gas-url" placeholder="https://script.google.com/macros/s/.../exec" value="https://script.google.com/macros/s/AKfycbz_mock_url_deployment_id/exec">
+              <p style="font-size: 10px; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
+                Paste the deployed Web App URL from Apps Script. Keep it secret to protect your sheet data.
+              </p>
+            </div>
+            <button class="btn btn-primary" id="btn-save-gas-url">
+              Save Connection URL
+            </button>
+          </div>
+        </div>
+
+        <!-- Guide Section -->
+        <div class="settings-section">
+          <div class="settings-section-title">Backend Setup Instructions</div>
+          <div class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+            <ol style="padding-left: 16px; font-size: 12px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 8px; line-height: 1.5;">
+              <li>Open the Google Sheet you want to write tree and expense logs to.</li>
+              <li>Go to <b>Extensions &gt; Apps Script</b>.</li>
+              <li>Delete all code in the script editor.</li>
+              <li>Copy and paste our specialized backend code.</li>
+              <li>Click <b>Deploy &gt; New Deployment</b>.</li>
+              <li>Select <b>Web App</b>. Change access to <b>"Anyone"</b> (critical for offline sync).</li>
+              <li>Authorize the permissions and copy the generated <b>Web App URL</b>.</li>
+              <li>Paste the URL into the input field above.</li>
+            </ol>
+            <button class="btn btn-ghost btn-full" id="btn-copy-backend-code" style="margin-top: 8px; font-size: 13px; border-color: var(--gold-dim); color: var(--gold);">
+              Copy Backend Script Code
+            </button>
+          </div>
+        </div>
+
+        <!-- Sites Directory -->
+        <div class="settings-section">
+          <div class="settings-section-title">Plantation Sites Directory (17)</div>
+          <div class="card" style="padding: 8px 0; max-height: 300px; overflow-y: auto; scrollbar-width: thin;">
+            
+            <div class="settings-item">
+              <div class="tree-item-id" style="width: 36px; height: 36px; font-size: 10px;">A</div>
+              <div class="settings-item-text">
+                <div class="settings-item-label" style="font-size: 13px; font-weight: 600;">Bhatera</div>
+                <div class="settings-item-sub" style="font-size: 11px;">Loc: Bhatera</div>
+              </div>
+              <div class="settings-item-right" style="text-align: right;">
+                <div style="color: var(--gold); font-weight: 600;">22 Trees</div>
+                <div style="font-size: 9px; color: var(--text-muted);">14/08/2022</div>
+              </div>
+            </div>
+
+            <div class="settings-item">
+              <div class="tree-item-id" style="width: 36px; height: 36px; font-size: 10px;">B</div>
+              <div class="settings-item-text">
+                <div class="settings-item-label" style="font-size: 13px; font-weight: 600;">East Islamnogar</div>
+                <div class="settings-item-sub" style="font-size: 11px;">Loc: Bhatera, East Islamnogar</div>
+              </div>
+              <div class="settings-item-right" style="text-align: right;">
+                <div style="color: var(--gold); font-weight: 600;">30 Trees</div>
+              </div>
+            </div>
+
+            <div class="settings-item">
+              <div class="tree-item-id" style="width: 36px; height: 36px; font-size: 10px;">C</div>
+              <div class="settings-item-text">
+                <div class="settings-item-label" style="font-size: 13px; font-weight: 600;">Singur/Garamchal</div>
+                <div class="settings-item-sub" style="font-size: 11px;">Loc: Pashim Singur, Garamchal</div>
+              </div>
+              <div class="settings-item-right" style="text-align: right;">
+                <div style="color: var(--gold); font-weight: 600;">150 Trees</div>
+                <div style="font-size: 9px; color: var(--text-muted);">31/01/2023</div>
+              </div>
+            </div>
+
+            <div class="settings-item">
+              <div class="tree-item-id" style="width: 36px; height: 36px; font-size: 10px;">D</div>
+              <div class="settings-item-text">
+                <div class="settings-item-label" style="font-size: 13px; font-weight: 600;">Hillside Nizampur</div>
+                <div class="settings-item-sub" style="font-size: 11px;">Loc: Hill Side - Nizampur</div>
+              </div>
+              <div class="settings-item-right" style="text-align: right;">
+                <div style="color: var(--gold); font-weight: 600;">37 Trees</div>
+                <div style="font-size: 9px; color: var(--text-muted);">30/01/2023</div>
+              </div>
+            </div>
+
+            <div class="settings-item">
+              <div class="tree-item-id" style="width: 36px; height: 36px; font-size: 10px;">Hing</div>
+              <div class="settings-item-text">
+                <div class="settings-item-label" style="font-size: 13px; font-weight: 600;">Hingasia</div>
+                <div class="settings-item-sub" style="font-size: 11px;">Loc: Hingazia</div>
+              </div>
+              <div class="settings-item-right" style="text-align: right;">
+                <div style="color: var(--gold); font-weight: 600;">400 Trees</div>
+                <div style="font-size: 9px; color: var(--text-muted);">31/08/2022</div>
+              </div>
+            </div>
+
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 8px; text-align: center;">
+            Total registered plantation trees across all sites: <b>2,445 trees</b>
+          </div>
+        </div>
+
+        <!-- Database Maintenance -->
+        <div class="settings-section" style="margin-bottom: 40px;">
+          <div class="settings-section-title">Local Database Maintenance</div>
+          <div class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+            <p style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+              If you experience database issues, or wish to free up local browser space, you can reset the app database.
+            </p>
+            <button class="btn btn-ghost btn-full" id="btn-wipe-db-mock" style="border-color: rgba(196,74,58,0.2); color: var(--red); background: var(--red-dim);">
+              Wipe Local DB & Reset App
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BOTTOM NAVIGATION BAR (Fixed at Bottom) ── -->
+      <nav class="bottom-nav">
+        
+        <div class="nav-item active" data-target="page-home">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span>Home</span>
+        </div>
+
+        <div class="nav-item" data-target="page-trees">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 6v12"></path>
+            <path d="M8 10h8"></path>
+          </svg>
+          <span>Trees</span>
+        </div>
+
+        <div class="nav-item" data-target="page-expenses">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+            <line x1="12" y1="4" x2="12" y2="20"></line>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+          </svg>
+          <span>Expenses</span>
+        </div>
+
+        <div class="nav-item" data-target="page-sync">
+          <div style="position: relative;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+            </svg>
+            <span style="position: absolute; top: -6px; right: -10px; background: var(--amber); color: #0a0f0a; font-size: 9px; font-weight: 700; border-radius: 50%; width: 15px; height: 15px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--bg-secondary);">
+              1
+            </span>
+          </div>
+          <span>Sync</span>
+        </div>
+
+        <div class="nav-item" data-target="page-settings">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Settings</span>
+        </div>
+
+      </nav>
+
+      <!-- ── MODAL: TREE STATUS FORM ── -->
+      <div class="modal-overlay" id="modal-tree">
+        <div class="modal-sheet">
+          <div class="modal-header">
+            <h2 class="modal-title">Log Tree Status</h2>
+            <button class="modal-close" id="btn-close-tree-modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="form-tree-mock">
+              
+              <div class="input-group">
+                <label class="input-label">Site *</label>
+                <select class="input" required>
+                  <option value="">Select a Plantation Site</option>
+                  <option value="A">A - Bhatera</option>
+                  <option value="B">B - East Islamnogar</option>
+                  <option value="C">C - Singur/Garamchal</option>
+                  <option value="D">D - Hillside Nizampur</option>
+                  <option value="Hingasia">Hingasia</option>
+                  <option value="RS">RS - Road Side</option>
+                </select>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Tree ID Marker *</label>
+                <input type="text" class="input" placeholder="e.g. RS1, A3, 105" required>
+              </div>
+
+              <div class="stat-row" style="padding: 0; margin: 0 0 16px 0;">
+                <div class="input-group" style="margin-bottom: 0;">
+                  <label class="input-label">Circumference (inches)</label>
+                  <input type="number" step="0.1" class="input" placeholder="e.g. 15.4">
+                </div>
+                <div class="input-group" style="margin-bottom: 0;">
+                  <label class="input-label">Date of Inoculation</label>
+                  <input type="date" class="input">
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Inoculant Type</label>
+                <select class="input">
+                  <option value="">Select Inoculant (if applied)</option>
+                  <option value="Busman - Tablet">Busman - Tablet</option>
+                  <option value="Busman - Straw">Busman - Straw</option>
+                  <option value="MSG">MSG</option>
+                  <option value="Vinegar">Vinegar</option>
+                  <option value="Vietnam (Trung)">Vietnam (Trung)</option>
+                </select>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">GPS Location</label>
+                <div class="gps-field" id="gps-field-mock">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  <span class="gps-value" id="gps-value-text">Tap to capture current GPS location</span>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Condition Chips</label>
+                <div class="chip-group" id="tree-chips-mock">
+                  <span class="chip active" data-val="ok">✓ OK / Healthy</span>
+                  <span class="chip" data-val="dead">💀 Dead</span>
+                  <span class="chip" data-val="broken">🌿 Alive - Broken</span>
+                  <span class="chip" data-val="noleaf">🍂 No Leaf</span>
+                  <span class="chip" data-val="top">⬆️ Top Broken</span>
+                  <span class="chip" data-val="inoculated">💉 Inoculated</span>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Notes & Description</label>
+                <textarea class="input" placeholder="Additional notes about tree status, health, or history..."></textarea>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Capture Photos</label>
+                <div class="photo-upload" id="photo-upload-mock">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--green-bright); margin-bottom: 8px;">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                  </svg>
+                  <div style="font-size: 13px; font-weight: 500;">Take Photo or Browse</div>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Supports multiple images</div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-full" style="margin-top: 8px;">
+                Save Tree Log
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MODAL: BUSINESS EXPENSE FORM ── -->
+      <div class="modal-overlay" id="modal-expense">
+        <div class="modal-sheet">
+          <div class="modal-header">
+            <h2 class="modal-title">Log Business Expense</h2>
+            <button class="modal-close" id="btn-close-expense-modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="form-expense-mock">
+              
+              <div class="input-group">
+                <label class="input-label">Amount in BDT (৳) *</label>
+                <input type="number" class="input" placeholder="e.g. 5000" required>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Category *</label>
+                <select class="input" required>
+                  <option value="">Select Expense Category</option>
+                  <option value="Tree Purchase">Tree Purchase</option>
+                  <option value="Labour Wages">Labour Wages</option>
+                  <option value="Travel / Transport">Travel / Transport</option>
+                  <option value="Food & Water">Food & Water</option>
+                  <option value="Tools & Equipment">Tools & Equipment</option>
+                  <option value="Caretaker">Caretaker</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Date of Expense *</label>
+                <input type="date" class="input" required id="expense-date-mock-input">
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Description / Details</label>
+                <textarea class="input" placeholder="Write who was paid, for what items, etc..."></textarea>
+              </div>
+
+              <div class="input-group">
+                <label class="input-label">Attach Receipt Photo</label>
+                <div class="photo-upload" id="receipt-upload-mock">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--gold); margin-bottom: 8px;">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                  <div style="font-size: 13px; font-weight: 500;">Capture Receipt or Browse</div>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Take photo of paper memo / voucher</div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-gold btn-full" style="margin-top: 8px;">
+                Save Expense
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Interactive JavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      // Toast notification helper
+      const showToast = (message, type = 'success') => {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        let borderStyle = 'var(--green-bright)';
+        if (type === 'error') borderStyle = 'var(--red)';
+        if (type === 'info') borderStyle = 'var(--gold)';
+        toast.style.borderLeft = `3px solid ${borderStyle}`;
+
+        toast.innerHTML = `
+          <div style="font-size: 13px; font-weight: 500;">${message}</div>
+        `;
+        
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(-10px)';
+          toast.style.transition = 'all 0.3s ease';
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      };
+
+      // Set today's date in form defaults
+      const today = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('expense-date-mock-input');
+      if (dateInput) dateInput.value = today;
+
+      // Bottom Navigation click handlers
+      const navItems = document.querySelectorAll('.nav-item');
+      const pages = document.querySelectorAll('.page-content');
+
+      const switchTab = (tabId) => {
+        pages.forEach(p => p.style.display = 'none');
+        navItems.forEach(item => item.classList.remove('active'));
+
+        const activePage = document.getElementById(tabId);
+        if (activePage) {
+          activePage.style.display = 'block';
+          activePage.classList.add('fade-in');
+        }
+
+        const activeNav = document.querySelector(`.nav-item[data-target="${tabId}"]`);
+        if (activeNav) {
+          activeNav.classList.add('active');
+        }
+      };
+
+      navItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const target = item.getAttribute('data-target');
+          switchTab(target);
+        });
+      });
+
+      // Quick links / page triggers
+      document.querySelectorAll('.tab-trigger').forEach(item => {
+        item.addEventListener('click', () => {
+          const tab = item.getAttribute('data-tab');
+          switchTab(`page-${tab}`);
+        });
+      });
+
+      document.getElementById('home-sync-card').addEventListener('click', () => switchTab('page-sync'));
+      document.getElementById('home-pending-banner').addEventListener('click', () => switchTab('page-sync'));
+      document.getElementById('home-stat-trees').addEventListener('click', () => switchTab('page-trees'));
+      document.getElementById('home-stat-expenses').addEventListener('click', () => switchTab('page-expenses'));
+      document.getElementById('home-view-all-activity').addEventListener('click', () => switchTab('page-trees'));
+      document.getElementById('header-notif-btn').addEventListener('click', () => switchTab('page-sync'));
+
+      // Modals open / close logic
+      const modalTree = document.getElementById('modal-tree');
+      const modalExpense = document.getElementById('modal-expense');
+
+      const openModal = (modal) => {
+        modal.style.display = 'flex';
+      };
+
+      const closeModal = (modal) => {
+        modal.style.display = 'none';
+      };
+
+      document.querySelectorAll('.btn-open-tree').forEach(btn => {
+        btn.addEventListener('click', () => openModal(modalTree));
+      });
+
+      document.querySelectorAll('.btn-open-expense').forEach(btn => {
+        btn.addEventListener('click', () => openModal(modalExpense));
+      });
+
+      document.getElementById('btn-close-tree-modal').addEventListener('click', () => closeModal(modalTree));
+      document.getElementById('btn-close-expense-modal').addEventListener('click', () => closeModal(modalExpense));
+      
+      modalTree.addEventListener('click', () => closeModal(modalTree));
+      modalExpense.addEventListener('click', () => closeModal(modalExpense));
+
+      // Chip toggles
+      const siteChips = document.querySelectorAll('.site-chip');
+      siteChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          siteChips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          showToast(`Filtered by Site: ${chip.textContent}`, 'info');
+        });
+      });
+
+      const conditionChips = document.querySelectorAll('#tree-chips-mock .chip');
+      conditionChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          chip.classList.toggle('active');
+        });
+      });
+
+      // GPS simulation
+      document.getElementById('gps-field-mock').addEventListener('click', () => {
+        const textSpan = document.getElementById('gps-value-text');
+        textSpan.className = "gps-value loading";
+        textSpan.textContent = "Fetching GPS coordinates...";
+        
+        setTimeout(() => {
+          textSpan.className = "gps-value";
+          textSpan.textContent = "Lat: 24.318291, Long: 91.802115 (±4.5m)";
+          document.getElementById('gps-field-mock').classList.add('has-location');
+          showToast("Mock GPS coordinates captured!", "success");
+        }, 1200);
+      });
+
+      // Photo upload simulations
+      document.getElementById('photo-upload-mock').addEventListener('click', () => {
+        showToast("Static Mock: Photo library opened (Simulated)", "info");
+      });
+
+      document.getElementById('receipt-upload-mock').addEventListener('click', () => {
+        showToast("Static Mock: Camera opened (Simulated)", "info");
+      });
+
+      // Form submissions
+      document.getElementById('form-tree-mock').addEventListener('submit', (e) => {
+        e.preventDefault();
+        showToast("Tree log saved locally!", "success");
+        closeModal(modalTree);
+        e.target.reset();
+      });
+
+      document.getElementById('form-expense-mock').addEventListener('submit', (e) => {
+        e.preventDefault();
+        showToast("Expense log saved locally!", "success");
+        closeModal(modalExpense);
+        e.target.reset();
+      });
+
+      // Sync Trigger
+      document.getElementById('btn-sync-trigger').addEventListener('click', () => {
+        const btn = document.getElementById('btn-sync-trigger');
+        const span = btn.querySelector('span');
+        
+        btn.disabled = true;
+        span.textContent = "Uploading Field Data...";
+        showToast("Syncing logs to Google Sheets...", "info");
+
+        setTimeout(() => {
+          btn.style.display = "none";
+          document.getElementById('pending-sync-item-mock').style.display = "none";
+          document.querySelector('#page-sync .card').innerHTML = `
+            <div style="text-align: center; padding: 36px 16px; color: var(--text-muted);">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--green-bright); margin-bottom: 8px;">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <div style="font-size: 13px; font-weight: 500; color: var(--text-secondary);">All synced!</div>
+              <p style="font-size: 11px; marginTop: 4px;">There are no unsynced logs in your offline database.</p>
+            </div>
+          `;
+          document.querySelector('#page-sync .section-title').textContent = "Queue Pending Sync (0)";
+          
+          // Also update home page displays
+          document.getElementById('home-pending-banner').style.display = "none";
+          document.getElementById('home-sync-status-text').innerHTML = "All field logs are fully synced with Cloud";
+          document.querySelector('.bottom-nav [data-target="page-sync"] span:nth-of-type(1) span').remove(); // remove badge
+          
+          showToast("Sync completed! Google Sheets updated.", "success");
+        }, 1500);
+      });
+
+      // Save connection
+      document.getElementById('btn-save-gas-url').addEventListener('click', () => {
+        const val = document.getElementById('settings-gas-url').value;
+        if (val.trim()) {
+          showToast("Apps Script Web App URL saved!", "success");
+        } else {
+          showToast("Please enter a valid URL", "error");
+        }
+      });
+
+      // Copy code
+      document.getElementById('btn-copy-backend-code').addEventListener('click', () => {
+        showToast("Backend script code copied to clipboard!", "success");
+      });
+
+      // Delete item alerts
+      document.querySelectorAll('.btn-delete-mock').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (confirm("Are you sure you want to delete this mock log?")) {
+            btn.closest('.tree-item').style.opacity = '0.5';
+            btn.style.display = 'none';
+            showToast("Log entry deleted successfully", "info");
+          }
+        });
+      });
+
+      // Wipe db mock
+      document.getElementById('btn-wipe-db-mock').addEventListener('click', () => {
+        if (confirm("DANGER: This will delete ALL logs stored on this device. Make sure you have synced first! Do you want to proceed?")) {
+          if (confirm("Are you absolutely certain? This operation CANNOT BE UNDONE.")) {
+            showToast("Mock Database wiped successfully", "info");
+            setTimeout(() => window.location.reload(), 1000);
+          }
+        }
+      });
+
+    });
+  </script>
+</body>
+</html>
